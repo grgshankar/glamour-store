@@ -1,9 +1,7 @@
 const router = require("express").Router();
-const Controller = require("./user.controllers");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
+const Controller = require("../users/user.controllers");
 
-router.post("/", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
   console.log(req.body);
   try {
     const result = await Controller.create(req.body);
