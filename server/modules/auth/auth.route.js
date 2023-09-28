@@ -24,4 +24,29 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+router.post("/verify", async (req, res, next) => {
+  try {
+    const { email, token } = req.body;
+    if (!email || !token) {
+      throw new Error("Email or token is missing");
+    }
+    const result = await Controller.verifyEmail(email.trim(), token);
+    res.json({ data: result, msg: "success" });
+  } catch (e) {
+    next(e);
+  }
+});
+router.post("/regenerate", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new Error("Email is missing");
+    }
+    const result = await Controller.regenarateToken(email);
+    res.json({ data: result, msg: "success" });
+  } catch (e) {
+    next(e);
+  }
+});
+
 module.exports = router;

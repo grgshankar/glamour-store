@@ -1,13 +1,14 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../users/user.model");
 const authModel = require("./auth.model");
-const { generateOTP } = require("../../utils/otp");
+const { generateOTP, verifyOTP } = require("../../utils/otp");
 
 const create = async (payload) => {
   const { password, ...rest } = payload;
   rest.password = await bcrypt.hash(password, +process.env.SALT_ROUNDS);
   const user = await userModel.create(rest);
   await authModel.create({ email: user?.email, token: generateOTP() });
+  //now need to send token to email
   return user;
 };
 
@@ -38,4 +39,37 @@ const login = async (email, password) => {
   return result;
 };
 
-module.exports = { create, login };
+const verifyEmail = async (email, token) => {
+  // authModel email check
+  const user = await authModel.findOne({ email });
+  if (!user) throw new Error("User not found...");
+
+  //OTP check
+  const isValidOTP = verifyOTP(token);
+  if (!isValidOTP) throw new Error("Token is expired...");
+
+  //authModel OTP token compare
+  const isValid = user?.token === +token;
+  if (!isValid) throw new Error("Token mismatched...");
+
+  //userModel isEmailVerified
+  await userModel.findOneAndUpdate(
+    { email },
+    { isEmailVerified: true },
+    { new: true }
+  );
+  return true;
+};
+
+const regenarateToken = async (email) => {
+  // authModel email check
+  const user = await authModel.findOne({ email });
+  if (!user) throw new Error("User not found...");
+
+  //generate new OTP
+  await authModel.findOneAndUpdate({ email }, { token: generateOTP() });
+  //now need to send token to email
+  return true;
+};
+
+module.exports = { create, login, regenarateToken, verifyEmail };
