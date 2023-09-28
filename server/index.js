@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 3000;
 const DB_URL = process.env.DB_URL;
 
 mongoose.connect(DB_URL).then(() => {
-  console.log("Database Connected...");
+  console.log("Database connected...");
+}).catch((err)=>{
+  console.log("Database connection error:", err)
 });
 
 app.use(cors());

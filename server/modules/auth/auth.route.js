@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const Controller = require("../users/user.controllers");
+const Controller = require("./auth.controller");
 
 router.post("/register", async (req, res, next) => {
   console.log(req.body);

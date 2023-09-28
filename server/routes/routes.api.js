@@ -1,6 +1,6 @@
 const router = require("express").Router();
-const userRouter = require("../modules/users/user.route");
 const authRouter = require("../modules/auth/auth.route");
+const userRouter = require("../modules/users/user.route");
 
 router.get("/", (req, res, next) => {
   res.json({ data: "", msg: "API Routes are working" });
